@@ -26,7 +26,6 @@ jobs:
       - name: Checkstyle
         run: ./gradlew checkstyleMain checkstyleTest
 
-      # ← ТОЛЬКО ПРИ PULL REQUEST!
       - name: Run Python MR Checker
         if: github.event_name == 'pull_request'
         env:
@@ -46,7 +45,7 @@ jobs:
             --mr-id "$PR_NUMBER" \
             --mode check-size
   
-  build:
+    build:
     needs: checkstyle
     runs-on: ubuntu-latest
     steps:
@@ -58,8 +57,10 @@ jobs:
           distribution: 'temurin'
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      - name: Build
+      - name: Build JAR
         run: ./gradlew build -x test
+      - name: List JARs
+        run: ls -la build/libs/ || echo "No JARs found"
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -87,16 +88,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Make gradlew executable  
-        run: chmod +x ./gradlew
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
           name: calculator-jar
+          path: ./downloaded-jar/  # ← ЯВНАЯ ПАПКА
+      - name: List downloaded files
+        run: ls -la ./downloaded-jar/ || echo "No files downloaded"
       - name: Publish Release
         run: |
           echo "Publishing calculator build..."
-          gh release create "calc-v${{ github.run_number }}" calculator-jar/*.jar \
+          JAR_FILE=$(ls ./downloaded-jar/*.jar | head -n1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "ERROR: No JAR file found!"
+            exit 1
+          fi
+          gh release create "calc-v${{ github.run_number }}" "$JAR_FILE" \
             --title "Calculator Build ${{ github.run_number }}" \
             --notes "Automated build from commit ${{ github.sha }}"
         env:
