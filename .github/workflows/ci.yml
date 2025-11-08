@@ -1,0 +1,80 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop, feature/*, bugfix/*, refactor/*, epic/* ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  checkstyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Checkstyle
+        run: ./gradlew checkstyleMain checkstyleTest
+      - name: Run Python MR Checker
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pip install PyGithub
+          python scripts/mr_checker.py \
+            --token "$GITHUB_TOKEN" \
+            --project "${{ github.repository }}" \
+            --mr-id ${{ github.event.pull_request.number }} \
+            --mode check-size
+
+  build:
+    needs: checkstyle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build
+        run: ./gradlew build -x test
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculator-jar
+          path: build/libs/*.jar
+          retention-days: 1
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Run Tests
+        run: ./gradlew test
+
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: calculator-jar
+      - name: Publish Release
+        run: |
+          echo "Publishing calculator build..."
+          gh release create "calc-v${{ github.run_number }}" calculator-jar/*.jar \
+            --title "Calculator Build ${{ github.run_number }}" \
+            --notes "Automated build from commit ${{ github.sha }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
