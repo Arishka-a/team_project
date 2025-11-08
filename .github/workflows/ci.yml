@@ -16,6 +16,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+         python-version: '3.11'
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Checkstyle
@@ -69,11 +74,11 @@ jobs:
         run: ./gradlew test
 
   publish:
-    needs: test  # ← ДОБАВЬ ЭТУ СТРОКУ!
+    needs: test  
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Make gradlew executable  # ← НЕОБЯЗАТЕЛЬНО, НО ЛУЧШЕ
+      - name: Make gradlew executable  
         run: chmod +x ./gradlew
       - name: Download Artifact
         uses: actions/download-artifact@v4
