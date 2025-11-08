@@ -17,31 +17,35 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Setup Python
-        uses: actions/setup-python@v3  # v5 → v3 (стабильнее, v5 может быть beta)
+        uses: actions/setup-python@v3
         with:
           python-version: '3.11'
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Checkstyle
         run: ./gradlew checkstyleMain checkstyleTest
+
+      # ← ТОЛЬКО ПРИ PULL REQUEST!
       - name: Run Python MR Checker
-        if: always() #github.event_name == 'pull_request'  # Убери для теста: if: always()
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          echo "Event name: ${{ github.event_name }}"  # ← ДОБАВЬ: лог event
-          echo "PR number: ${{ github.event.pull_request.number }}"  # ← ДОБАВЬ: лог PR ID
-          if [ ! -f "scripts/mr_checker.py" ]; then
-            echo "ERROR: scripts/mr_checker.py not found!"
+          echo "Event: ${{ github.event_name }}"
+          echo "PR Number: $PR_NUMBER"
+          if [ -z "$PR_NUMBER" ]; then
+            echo "ERROR: PR number is empty!"
             exit 1
           fi
           pip install PyGithub
           python scripts/mr_checker.py \
             --token "$GITHUB_TOKEN" \
             --project "${{ github.repository }}" \
-            --mr-id ${{ github.event.pull_request.number }} \
+            --mr-id "$PR_NUMBER" \
             --mode check-size
-
+  
   build:
     needs: checkstyle
     runs-on: ubuntu-latest
