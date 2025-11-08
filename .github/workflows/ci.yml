@@ -26,9 +26,8 @@ jobs:
       - name: Checkstyle
         run: ./gradlew checkstyleMain checkstyleTest
 
-      # ← ТОЛЬКО ПРИ PULL REQUEST!
       - name: Run Python MR Checker
-        if: github.event_name == 'pull_request'
+        if: always() #github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
