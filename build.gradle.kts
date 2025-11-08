@@ -31,6 +31,6 @@ application {
 
 checkstyle {
     toolVersion = "10.12.0"
-    configFile = file("config/checkstyle/checkstyle.xml")
+    configFile = file("$rootDir/config/checkstyle/checkstyle.xml")
     maxWarnings = 0
 }
