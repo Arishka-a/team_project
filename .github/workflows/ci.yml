@@ -27,7 +27,7 @@ jobs:
         run: ./gradlew checkstyleMain checkstyleTest
 
       - name: Run Python MR Checker
-        if: always() #github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -45,7 +45,7 @@ jobs:
             --mr-id "$PR_NUMBER" \
             --mode check-size
   
-  build:
+    build:
     needs: checkstyle
     runs-on: ubuntu-latest
     steps:
@@ -57,13 +57,15 @@ jobs:
           distribution: 'temurin'
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      - name: Build
-        run: ./gradlew build -x test
+      - name: Build JAR
+        run: ./gradlew build -x test  # ← УБЕДИСЬ, что JAR создаётся
+      - name: List JARs
+        run: ls -la build/libs/  # ← ПРОВЕРКА: есть ли .jar?
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: calculator-jar
-          path: build/libs/*.jar
+          path: build/libs/*.jar  # ← ТОЧНЫЙ ПУТЬ
           retention-days: 1
 
   test:
@@ -92,6 +94,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: calculator-jar
+          path: calculator-jar/  # ← ЯВНЫЙ ПУТЬ
+      - name: List downloaded files
+        run: ls -la calculator-jar/  # ← ПРОВЕРКА
       - name: Publish Release
         run: |
           echo "Publishing calculator build..."
