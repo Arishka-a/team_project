@@ -30,7 +30,7 @@ application {
 }
 
 checkstyle {
-    toolVersion.set("10.12.0")
-    configFile.set(file("config/checkstyle/checkstyle.xml"))
-    maxWarnings.set(0)
+    toolVersion = "10.12.0"
+    configFile = file("config/checkstyle/checkstyle.xml")
+    maxWarnings = 0
 }
