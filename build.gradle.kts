@@ -1,5 +1,4 @@
 plugins {
-    `kotlin-dsl`       // ← ОБЯЗАТЕЛЬНО!
     java
     checkstyle
     application
