@@ -11,7 +11,7 @@ jobs:
   stage1-checks:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -33,12 +33,13 @@ jobs:
       - name: Checkstyle
         run: ./gradlew checkstyleMain checkstyleTest
 
-      # === MR Size Check ===
-      - name: MR Size Check
+      # === Проверка размера PR ===
+      - name: Проверка размера Pull Request
         if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
+          echo "Проверяем размер PR..."
           python -m pip install PyGithub --quiet
           python scripts/check_pr.py \
             --token "$GITHUB_TOKEN" \
@@ -46,24 +47,25 @@ jobs:
             --pr-number ${{ github.event.pull_request.number }} \
             --check-size
 
-      # === List Project Members ===
-      - name: List Project Members
+      # === Вывод участников проекта ===
+      - name: Вывод участников проекта
         if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
+          echo "Получаем команду..."
           python scripts/check_pr.py \
             --token "$GITHUB_TOKEN" \
             --repo "${{ github.repository }}" \
             --list-members
 
-      # === Update Epic PR Description ===
-      - name: Update Epic PR Description
+      # === Обновление описания Epic PR ===
+      - name: Обновление описания Epic PR
         if: github.event_name == 'pull_request' && contains(github.head_ref, 'epic/')
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          echo "Updating epic PR description..."
+          echo "Обновляем epic PR..."
           python scripts/check_pr.py \
             --token "$GITHUB_TOKEN" \
             --repo "${{ github.repository }}" \
@@ -118,7 +120,7 @@ jobs:
         with:
           name: calculator-jar
           path: ./downloaded-jar/
-      - name: Publish Release
+      - name: Публикация релиза
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
