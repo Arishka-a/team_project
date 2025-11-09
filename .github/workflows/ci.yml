@@ -3,11 +3,11 @@ name: CI Pipeline
 on:
   push:
     branches: [ main, develop, feature/*, bugfix/*, refactor/*, epic/* ]
-  pull_request_target:
+  pull_request:
     branches: [ main, develop ]
 
-# === STAGE 1: Code Style + Python Checks ===
 jobs:
+  # === STAGE 1: Code Style + Python Checks ===
   stage1-checks:
     runs-on: ubuntu-latest
     permissions:
@@ -35,7 +35,7 @@ jobs:
 
       # === MR Size Check ===
       - name: MR Size Check
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
@@ -48,7 +48,7 @@ jobs:
 
       # === List Team Members ===
       - name: List Team Members
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
@@ -59,7 +59,7 @@ jobs:
 
       # === Update Epic PR Description (через Python) ===
       - name: Update Epic PR Description
-        if: (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') && contains(github.head_ref, 'epic/')
+        if: github.event_name == 'pull_request' && contains(github.head_ref, 'epic/')
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
@@ -69,28 +69,6 @@ jobs:
             --repo "${{ github.repository }}" \
             --pr-number ${{ github.event.pull_request.number }} \
             --update-epic
-
-      # === Update PR body (через GitHub API напрямую) ===
-      - name: Update PR Body with GitHub Script
-        if: >
-          (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')
-          && contains(github.head_ref, 'epic/')
-          && github.event.pull_request.head.repo.full_name == github.repository
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.RELEASE_TOKEN }}
-          script: |
-            const prNumber = context.payload.pull_request.number;
-            console.log(`🔄 Updating PR #${prNumber} description...`);
-
-            await github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              body: "\n\n### Подзадачи:\n"
-            });
-
-            console.log("✅ Epic PR description updated successfully via GitHub Script!");
 
   # === STAGE 2: Build JAR ===
   stage2-build:
