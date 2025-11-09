@@ -21,7 +21,9 @@ public class Calculator {
     }
 
     public double sqrt(double a) {
-        if (a < 0) throw new IllegalArgumentException("Negative value");
+        if (a < 0) {
+            throw new IllegalArgumentException("Negative value");
+        }
         return Math.sqrt(a);
     }
 
