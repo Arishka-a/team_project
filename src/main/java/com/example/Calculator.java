@@ -20,19 +20,9 @@ public class Calculator {
         return a / b;
     }
 
-    public double power(double a, double b) {
-        return Math.pow(a, b);
-    }
-
     public double sqrt(double a) {
-    if (a < 0) throw new IllegalArgumentException("Negative value");
+        if (a < 0) throw new IllegalArgumentException("Negative value");
         return Math.sqrt(a);
-    }
-
-    public long factorial(int n) {
-        if (n < 0) throw new IllegalArgumentException("Negative factorial");
-        if (n == 0 || n == 1) return 1;
-        return n * factorial(n - 1);
     }
 
     public static void main(String[] args) {
@@ -45,8 +35,6 @@ public class Calculator {
         } catch (ArithmeticException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        System.out.println("3 ^ 2 = " + calc.power(3, 2));
         System.out.println("√9 = " + calc.sqrt(9));
-        System.out.println("5! = " + calc.factorial(5));
     }
 }
