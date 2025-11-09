@@ -11,8 +11,8 @@ jobs:
   stage1-checks:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -40,31 +40,31 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           python -m pip install PyGithub --quiet
-          python scripts/mr_checker.py \
+          python scripts/check_pr.py \
             --token "$GITHUB_TOKEN" \
-            --project "${{ github.repository }}" \
-            --mr-id ${{ github.event.pull_request.number }} \
-            --mode check-size || exit 1
+            --repo "${{ github.repository }}" \
+            --pr-number ${{ github.event.pull_request.number }} \
+            --check-size
 
-      # === List Team Members ===
-      - name: List Team Members
+      # === List Project Members ===
+      - name: List Project Members
         if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          python scripts/mr_checker.py \
+          python scripts/check_pr.py \
             --token "$GITHUB_TOKEN" \
-            --project "${{ github.repository }}" \
-            --mode list-users
+            --repo "${{ github.repository }}" \
+            --list-members
 
-      # === Update Epic PR Description (через Python) ===
+      # === Update Epic PR Description ===
       - name: Update Epic PR Description
         if: github.event_name == 'pull_request' && contains(github.head_ref, 'epic/')
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          echo "Updating epic PR description via Python..."
-          python3 scripts/update_epic.py \
+          echo "Updating epic PR description..."
+          python scripts/check_pr.py \
             --token "$GITHUB_TOKEN" \
             --repo "${{ github.repository }}" \
             --pr-number ${{ github.event.pull_request.number }} \
