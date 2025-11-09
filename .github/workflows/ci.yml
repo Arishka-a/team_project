@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   push:
     branches: [ main, develop, feature/*, bugfix/*, refactor/*, epic/* ]
-  pull_request:
+  pull_request_target:
     branches: [ main, develop ]
 
 # === STAGE 1: Code Style + Python Checks ===
@@ -11,7 +11,7 @@ stage1-checks:
   runs-on: ubuntu-latest
   permissions:
     pull-requests: write
-    contents: read
+    contents: write
   steps:
     - uses: actions/checkout@v4
 
