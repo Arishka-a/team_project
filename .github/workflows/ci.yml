@@ -56,12 +56,13 @@ stage1-checks:
           --project "${{ github.repository }}" \
           --mode list-users
 
-    # === Update Epic PR Description ===
+    # === Update Epic PR Description (ТОЛЬКО PYTHON) ===
     - name: Update Epic PR Description
       if: github.event_name == 'pull_request' && contains(github.head_ref, 'epic/')
       env:
         GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       run: |
+        echo "Updating epic PR description..."
         python3 scripts/update_epic.py \
           --token "$GITHUB_TOKEN" \
           --repo "${{ github.repository }}" \
