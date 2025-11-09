@@ -80,6 +80,9 @@ jobs:
     needs: test
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: Download Artifact
@@ -88,14 +91,13 @@ jobs:
           name: calculator-jar
           path: ./downloaded-jar/
       - name: List downloaded files
-        run: ls -la ./downloaded-jar/ || echo "No files downloaded"
+        run: ls -la ./downloaded-jar/
       - name: Publish Release
         run: |
           echo "Publishing calculator build..."
           JAR_FILE=$(ls ./downloaded-jar/*.jar | head -n1)
           if [ -z "$JAR_FILE" ]; then
             echo "ERROR: No JAR file found!"
-            ls -la ./downloaded-jar/ || true
             exit 1
           fi
           echo "Found JAR: $JAR_FILE"
@@ -103,4 +105,4 @@ jobs:
             --title "Calculator Build ${{ github.run_number }}" \
             --notes "Automated build from ${{ github.sha }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
