@@ -20,6 +20,10 @@ public class Calculator {
         return a / b;
     }
 
+    public double power(double a, double b) {
+        return Math.pow(a, b);
+    }
+
     public static void main(String[] args) {
         Calculator calc = new Calculator();
         System.out.println("3 + 5 = " + calc.add(3, 5));
@@ -30,5 +34,6 @@ public class Calculator {
         } catch (ArithmeticException e) {
             System.out.println("Error: " + e.getMessage());
         }
+        System.out.println("3 ^ 2 = " + calc.power(3, 2));
     }
 }
