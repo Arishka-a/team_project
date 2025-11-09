@@ -20,32 +20,24 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: '3.11'
-
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Checkstyle
         run: ./gradlew checkstyleMain checkstyleTest
-
-      # ← ТОЛЬКО ПРИ PULL REQUEST!
       - name: Run Python MR Checker
         if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          echo "Event: ${{ github.event_name }}"
-          echo "PR Number: $PR_NUMBER"
-          if [ -z "$PR_NUMBER" ]; then
-            echo "ERROR: PR number is empty!"
-            exit 1
-          fi
-          pip install PyGithub
+          echo "Checking PR #$PR_NUMBER"
+          python -m pip install PyGithub --quiet
           python scripts/mr_checker.py \
             --token "$GITHUB_TOKEN" \
             --project "${{ github.repository }}" \
             --mr-id "$PR_NUMBER" \
-            --mode check-size
-  
+            --mode check-size || exit 1
+
   build:
     needs: checkstyle
     runs-on: ubuntu-latest
@@ -58,8 +50,10 @@ jobs:
           distribution: 'temurin'
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      - name: Build
+      - name: Build JAR
         run: ./gradlew build -x test
+      - name: List JARs
+        run: ls -la build/libs/
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -83,21 +77,30 @@ jobs:
         run: ./gradlew test
 
   publish:
-    needs: test  
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Make gradlew executable  
-        run: chmod +x ./gradlew
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
           name: calculator-jar
+          path: ./downloaded-jar/
+      - name: List downloaded files
+        run: ls -la ./downloaded-jar/ || echo "No files downloaded"
       - name: Publish Release
         run: |
           echo "Publishing calculator build..."
-          gh release create "calc-v${{ github.run_number }}" calculator-jar/*.jar \
+          JAR_FILE=$(ls ./downloaded-jar/*.jar | head -n1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "ERROR: No JAR file found!"
+            ls -la ./downloaded-jar/ || true
+            exit 1
+          fi
+          echo "Found JAR: $JAR_FILE"
+          gh release create "calc-v${{ github.run_number }}" "$JAR_FILE" \
             --title "Calculator Build ${{ github.run_number }}" \
-            --notes "Automated build from commit ${{ github.sha }}"
+            --notes "Automated build from ${{ github.sha }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

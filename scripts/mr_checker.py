@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import sys
-from github import Github
+from github import Github, GithubException
 
 def main():
     parser = argparse.ArgumentParser(description="GitHub MR Checker")
@@ -11,8 +11,13 @@ def main():
     parser.add_argument('--mode', choices=['list-users', 'check-size'], required=True)
     args = parser.parse_args()
 
-    gh = Github(args.token)
-    repo = gh.get_repo(args.project)
+    try:
+        from github import Auth
+        gh = Github(auth=Auth.Token(args.token))
+        repo = gh.get_repo(args.project)
+    except GithubException as e:
+        print(f"ERROR: Failed to connect to GitHub: {e}")
+        sys.exit(1)
 
     if args.mode == 'list-users':
         print("Team members:")
@@ -30,30 +35,37 @@ def main():
             print(f"  Error fetching team: {e}")
 
     elif args.mode == 'check-size' and args.mr_id:
-        pr = repo.get_pull(args.mr_id)
-        branch = pr.head.ref.lower()
-        total_lines = pr.additions + pr.deletions
+        try:
+            pr = repo.get_pull(args.mr_id)
+            branch = pr.head.ref.lower()
+            total_lines = pr.additions + pr.deletions
 
-        if 'epic' in branch:
-            print(f"Epic PR: {total_lines} lines → ALLOWED (no limit)")
-            return
+            if 'epic' in branch:
+                print(f"Epic PR: {total_lines} lines → ALLOWED (no limit)")
+                return
 
-        limits = {
-            'feature': 300,
-            'refactor': 400,
-            'bugfix': 150
-        }
-        limit = 300
-        for key in limits:
-            if key in branch:
-                limit = limits[key]
-                break
+            limits = {
+                'feature': 300,
+                'refactor': 400,
+                'bugfix': 150
+            }
+            limit = 300
+            for key in limits:
+                if key in branch:
+                    limit = limits[key]
+                    break
 
-        if total_lines > limit:
-            print(f"FAIL: {total_lines} lines > {limit} (branch: {branch})")
+            if total_lines > limit:
+                print(f"FAIL: {total_lines} lines > {limit} (branch: {branch})")
+                sys.exit(1)
+            else:
+                print(f"PASS: {total_lines} ≤ {limit} (branch: {branch})")
+        except GithubException as e:
+            print(f"ERROR: Failed to fetch PR {args.mr_id}: {e}")
             sys.exit(1)
-        else:
-            print(f"PASS: {total_lines} ≤ {limit} (branch: {branch})")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            sys.exit(1)
 
 if __name__ == '__main__':
     main()
