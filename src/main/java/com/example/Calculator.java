@@ -29,6 +29,12 @@ public class Calculator {
         return Math.sqrt(a);
     }
 
+    public long factorial(int n) {
+        if (n < 0) throw new IllegalArgumentException("Negative factorial");
+        if (n == 0 || n == 1) return 1;
+        return n * factorial(n - 1);
+    }
+
     public static void main(String[] args) {
         Calculator calc = new Calculator();
         System.out.println("3 + 5 = " + calc.add(3, 5));
@@ -41,5 +47,6 @@ public class Calculator {
         }
         System.out.println("3 ^ 2 = " + calc.power(3, 2));
         System.out.println("√9 = " + calc.sqrt(9));
+        System.out.println("5! = " + calc.factorial(5));
     }
 }
