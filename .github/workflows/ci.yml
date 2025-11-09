@@ -34,7 +34,7 @@ stage1-checks:
 
     # === MR Size Check ===
     - name: MR Size Check
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
       env:
         GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       run: |
