@@ -20,6 +20,13 @@ public class Calculator {
         return a / b;
     }
 
+    public double sqrt(double a) {
+        if (a < 0) {
+            throw new IllegalArgumentException("Negative value");
+        }
+        return Math.sqrt(a);
+    }
+
     public static void main(String[] args) {
         Calculator calc = new Calculator();
         System.out.println("3 + 5 = " + calc.add(3, 5));
@@ -30,5 +37,6 @@ public class Calculator {
         } catch (ArithmeticException e) {
             System.out.println("Error: " + e.getMessage());
         }
+        System.out.println("√9 = " + calc.sqrt(9));
     }
 }
