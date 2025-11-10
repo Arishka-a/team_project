@@ -62,7 +62,7 @@ def list_team_members(gh, repo_name: str):
         print(f"  Ошибка получения команды: {e}")
 
 def update_epic_description(gh, repo_name: str, pr_number: int):
-    """Обновление описания epic PR в формате задания"""
+    """Обновление описания epic PR в красивом формате"""
     print("\n" + "=" * 60)
     print("ОБНОВЛЕНИЕ ОПИСАНИЯ EPIC PR")
     print("=" * 60)
@@ -81,34 +81,25 @@ def update_epic_description(gh, repo_name: str, pr_number: int):
         print(f" Ветка: {source_branch}")
         print(f" Заголовок: {epic_pr.title}")
 
-        # Ищем child PR (base = source_branch epic)
         child_prs = repo.get_pulls(state='all', base=source_branch)
         pr_list = list(child_prs)
 
-        # Формируем строки в формате задания
         description_lines = []
         found = False
         for pr in pr_list:
             if pr.number == pr_number:
-                continue  # Пропускаем сам epic PR
+                continue
 
-            # Статус чекбокса
-            if pr.merged or pr.state == 'closed':
-                checkbox = "ЗакрытДа"
+            # Статус
+            if pr.merged:
+                status = "merged"
+            elif pr.state == "closed":
+                status = "closed"
             else:
-                checkbox = "ЗакрытилиНет"
+                status = "open"
 
-            # Ссылка на PR
-            pr_url = pr.html_url
-
-            # Название задачи = title PR
-            task_name = pr.title
-
-            # Branch child PR
-            child_branch = pr.head.ref
-
-            # Строка в формате задания
-            line = f"!{pr_url} {task_name} {child_branch} {checkbox}"
+            # Строка: - [status] #num Title branch
+            line = f"- [{status}] #{pr.number} {pr.title} {pr.head.ref}"
             description_lines.append(line)
             print(f" Добавлена: {line}")
             found = True
@@ -116,20 +107,17 @@ def update_epic_description(gh, repo_name: str, pr_number: int):
         if not found:
             description_lines.append("_Нет связанных PR_")
 
-        # Добавляем оригинальное описание, если оно было
+        # Оригинальное описание
         original_body = epic_pr.body or ""
-        if original_body and not any("!ссылканаМР" in original_body for _ in range(1)):  # Если нет формата задания
-            description_lines.append("")
-            description_lines.append("---")
-            description_lines.append("")
-            description_lines.append("## Оригинальное описание")
-            description_lines.append("")
-            description_lines.append(original_body)
+        if original_body and "## Связанные Pull Requests" not in original_body:
+            description_lines.extend([
+                "", "---", "", "## Оригинальное описание", "", original_body
+            ])
 
         new_description = "\n".join(description_lines)
         epic_pr.edit(body=new_description)
 
-        print(f"\nОписание epic PR #{pr_number} обновлено в формате задания!")
+        print(f"\nОписание epic PR #{pr_number} обновлено в красивом формате!")
         print("=" * 60 + "\n")
 
     except GithubException as e:
