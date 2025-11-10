@@ -20,11 +20,14 @@ public class Calculator {
         return a / b;
     }
 
-    public double sqrt(double a) {
-        if (a < 0) {
-            throw new IllegalArgumentException("Negative value");
+    public long factorial(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Negative factorial");
         }
-        return Math.sqrt(a);
+        if (n == 0 || n == 1) {
+            return 1;
+        }
+        return n * factorial(n - 1);
     }
 
     public static void main(String[] args) {
@@ -37,6 +40,6 @@ public class Calculator {
         } catch (ArithmeticException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        System.out.println("√9 = " + calc.sqrt(9));
+        System.out.println("5! = " + calc.factorial(5));
     }
 }
