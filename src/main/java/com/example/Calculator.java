@@ -37,6 +37,6 @@ public class Calculator {
         } catch (ArithmeticException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        System.out.println("√9 = " + calc.modulo(10,3));
+        System.out.println("10 % 3 = " + calc.modulo(10, 3));
     }
 }
