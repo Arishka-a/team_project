@@ -20,11 +20,11 @@ public class Calculator {
         return a / b;
     }
 
-    public double sqrt(double a) {
-        if (a < 0) {
-            throw new IllegalArgumentException("Negative value");
+    public double modulo(double a, double b) {
+        if (b == 0) {
+            throw new ArithmeticException("Modulo by zero");
         }
-        return Math.sqrt(a);
+        return a % b;
     }
 
     public static void main(String[] args) {
@@ -37,6 +37,6 @@ public class Calculator {
         } catch (ArithmeticException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        System.out.println("√9 = " + calc.sqrt(9));
+        System.out.println("√9 = " + calc.modulo(10,3));
     }
 }
