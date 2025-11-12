@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse
 import sys
 from github import Github, GithubException
@@ -16,12 +15,10 @@ def check_pr_size(gh, repo_name: str, pr_number: int):
         print(f" Ветка: {branch}")
         print(f" Строк добавлено/удалено: {lines}")
 
-        # Epic — без лимита
         if 'epic/' in branch:
             print(f"Epic PR: {lines} строк → РАЗРЕШЕНО (без лимита)")
             return
 
-        # Лимиты
         limits = {
             'feature': 300,
             'refactor': 400,
@@ -62,7 +59,7 @@ def list_team_members(gh, repo_name: str):
         print(f"  Ошибка получения команды: {e}")
 
 def update_epic_description(gh, repo_name: str, pr_number: int):
-    """Обновление описания epic PR в красивом формате"""
+    """Обновление описания epic PR"""
     print("\n" + "=" * 60)
     print("ОБНОВЛЕНИЕ ОПИСАНИЯ EPIC PR")
     print("=" * 60)
@@ -90,7 +87,6 @@ def update_epic_description(gh, repo_name: str, pr_number: int):
             if pr.number == pr_number:
                 continue
 
-            # Статус
             if pr.merged:
                 status = "merged"
             elif pr.state == "closed":
@@ -98,7 +94,6 @@ def update_epic_description(gh, repo_name: str, pr_number: int):
             else:
                 status = "open"
 
-            # Строка: - [status] #num Title branch
             line = f"- [{status}] #{pr.number} {pr.title} {pr.head.ref}"
             description_lines.append(line)
             print(f" Добавлена: {line}")
@@ -107,17 +102,15 @@ def update_epic_description(gh, repo_name: str, pr_number: int):
         if not found:
             description_lines.append("_Нет связанных PR_")
 
-        # Оригинальное описание
         original_body = epic_pr.body or ""
         if original_body and "## Связанные Pull Requests" not in original_body:
             description_lines.extend([
-                "", "---", "", "## Оригинальное описание", "", original_body
+                "", "---", "", "## Описание", "", original_body
             ])
 
         new_description = "\n".join(description_lines)
         epic_pr.edit(body=new_description)
 
-        print(f"\nОписание epic PR #{pr_number} обновлено в красивом формате!")
         print("=" * 60 + "\n")
 
     except GithubException as e:
@@ -133,7 +126,6 @@ def main():
     parser.add_argument('--repo', required=True, help='owner/repo')
     parser.add_argument('--pr-number', type=int, help='PR number')
 
-    # Режимы
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--check-size', action='store_true', help='Check PR size')
     group.add_argument('--list-members', action='store_true', help='List team members')
