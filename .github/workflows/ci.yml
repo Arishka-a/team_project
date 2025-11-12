@@ -7,12 +7,12 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  # === STAGE 1: Checkstyle + Python Checks ===
+  # STAGE 1: Checkstyle + Python Checks 
   checkstyle:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write  # ← ДЛЯ ОБНОВЛЕНИЯ ОПИСАНИЯ PR
+      pull-requests: write  
     steps:
       - uses: actions/checkout@v4
 
@@ -33,7 +33,7 @@ jobs:
       - name: Checkstyle
         run: ./gradlew checkstyleMain checkstyleTest
 
-      # === Проверка размера PR ===
+      # Проверка размера PR 
       - name: Проверка размера PR
         if: github.event_name == 'pull_request'
         env:
@@ -47,7 +47,7 @@ jobs:
             --pr-number ${{ github.event.pull_request.number }} \
             --check-size
 
-      # === Вывод команды ===
+      # Вывод команды 
       - name: Вывод команды
         if: github.event_name == 'pull_request'
         env:
@@ -58,7 +58,7 @@ jobs:
             --repo "${{ github.repository }}" \
             --list-members
 
-      # === Обновление Epic PR ===
+      # Обновление Epic PR 
       - name: Обновление описания Epic PR
         if: github.event_name == 'pull_request' && contains(github.head_ref, 'epic/')
         env:
@@ -71,7 +71,7 @@ jobs:
             --pr-number ${{ github.event.pull_request.number }} \
             --update-epic
 
-  # === STAGE 2: Build JAR ===
+  # STAGE 2: Build 
   build:
     needs: checkstyle
     runs-on: ubuntu-latest
@@ -90,7 +90,7 @@ jobs:
           path: build/libs/*.jar
           retention-days: 1
 
-  # === STAGE 3: Run Tests ===
+  # STAGE 3: Run Tests 
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -103,9 +103,9 @@ jobs:
       - run: chmod +x ./gradlew
       - run: ./gradlew test
 
-  # === STAGE 4: Publish Release (НЕЗАВИСИМО ОТ ТЕСТОВ) ===
+  # STAGE 4: Publish Release 
   publish:
-    needs: build  # ← Только от build, НЕ от test
+    needs: build  
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
     permissions:
@@ -118,7 +118,7 @@ jobs:
           name: calculator-jar
           path: ./downloaded-jar/
       - name: Публикация релиза
-        if: always()  # ← Даже если тесты упали
+        if: always()  
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |

@@ -38,5 +38,6 @@ public class Calculator {
             System.out.println("Error: " + e.getMessage());
         }
         System.out.println("10 % 3 = " + calc.modulo(10, 3));
+        System.out.println("10 % 2 = " + calc.modulo(10, 2));
     }
 }
