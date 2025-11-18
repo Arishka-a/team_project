@@ -109,22 +109,30 @@ jobs:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      packages: write
+      contents: write  
+      packages: write   
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/download-artifact@v4
         with:
           name: calculator-jar
           path: ./downloaded-jar/
+
       - name: Публикация релиза
-        if: always()  
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}  
         run: |
           JAR_FILE=$(ls ./downloaded-jar/*.jar | head -n1)
-          [ -z "$JAR_FILE" ] && { echo "ERROR: No JAR!"; exit 1; }
+          [ -z "$JAR_FILE" ] && { echo "ERROR: JAR file not found!"; exit 1; }
+
           echo "Публикация: $JAR_FILE"
-          gh release create "calc-v${{ github.run_number }}" "$JAR_FILE" \
+          TAG="calc-v${{ github.run_number }}"
+
+          # Главное — добавлен --clobber
+          gh release create "$TAG" "$JAR_FILE" \
+            --repo "${{ github.repository }}" \
             --title "Calculator Build ${{ github.run_number }}" \
-            --notes "Auto from ${{ github.sha }}"
+            --notes "Автоматический релиз из коммита ${{ github.sha }}" \
+            --clobber
