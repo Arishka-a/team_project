@@ -104,12 +104,12 @@ jobs:
       - run: ./gradlew test
 
   # STAGE 4: Publish Release 
-    publish:
+  publish:
     needs: build  
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
     permissions:
-      contents: write    # обязательно для релизов и тегов
+      contents: write      
 
     steps:
       - uses: actions/checkout@v4
@@ -121,7 +121,7 @@ jobs:
 
       - name: Публикация релиза
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # ← ЭТО ГЛАВНОЕ ИЗМЕНЕНИЕ
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
         run: |
           JAR_FILE=$(ls ./downloaded-jar/*.jar | head -n1)
           [ -z "$JAR_FILE" ] && { echo "ERROR: JAR not found!"; exit 1; }
@@ -130,10 +130,11 @@ jobs:
           TAG="calc-v${{ github.run_number }}"
 
           if gh release view "$TAG" > /dev/null 2>&1; then
-            echo "Релиз $TAG уже есть — удаляем старый"
-            gh release delete "$TAG" -y --cleanup-tag || true
+            echo "Релиз $TAG уже существует — удаляем старый"
+            gh release delete "$TAG" --yes --cleanup-tag || true
           fi
 
           gh release create "$TAG" "$JAR_FILE" \
             --title "Calculator Build ${{ github.run_number }}" \
-            --notes "Автоматический релиз из ${{ github.sha }}"
+            --notes "Автоматический релиз из ${{ github.sha }}" \
+            --target "${{ github.sha }}"
