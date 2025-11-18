@@ -36,7 +36,7 @@
 
 ### Stage 4 
 #### Публикация релиза: 
-- [publish job](.github/workflows/ci.yml#L106-L130)
+- [publish job](.github/workflows/ci.yml#L106-L140)
 
 
 
