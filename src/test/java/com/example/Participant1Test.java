@@ -4,9 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Участник 1 - Тесты сложения")
@@ -46,20 +43,14 @@ class Participant1Test {
 
 
     @Test
-    @DisplayName("UI: Проверка вывода операции сложения в main()")
-    void testAddOutputInMain() {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(outputStream));
+    @DisplayName("Юнит: Сложение отрицательных чисел")
+    void testAddNegativeNumbers() {
+        double a = -10.0;
+        double b = -5.5;
 
-        try {
-            Calculator.main(new String[]{});
+        double result = calculator.add(a, b);
 
-            String output = outputStream.toString();
-            assertTrue(output.contains("3 + 5 = 8.0"),
-                    "Вывод должен содержать '3 + 5 = 8.0'");
-        } finally {
-            System.setOut(originalOut);
-        }
+        assertEquals(-15.5, result, 0.001,
+                "Сложение -10.0 + (-5.5) должно дать -15.5");
     }
 }
