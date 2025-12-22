@@ -12,8 +12,12 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 700px;
     margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 header {
@@ -21,40 +25,116 @@ header {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 20px;
 }
 
-header h1 {
-    color: white;
+h1 {
+    color: #667eea;
     font-size: 2rem;
 }
 
 .back-link {
-    color: white;
+    color: #667eea;
     text-decoration: none;
-    padding: 10px 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    transition: all 0.3s;
+    font-weight: bold;
+    transition: color 0.3s;
 }
 
 .back-link:hover {
-    background: rgba(255, 255, 255, 0.3);
+    color: #764ba2;
 }
 
 .settings-section {
-    background: white;
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }
 
-.settings-section h2 {
+h2 {
     color: #333;
-    margin-bottom: 30px;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
 }
 
-/* TODO: Добавьте свои стили здесь */
+.setting-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.setting-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.setting-group input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.setting-group select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 200px;
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 15px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #d0d0d0;
+}
+
+.message {
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.message.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.message.error {
+    background: #f8d7da;
+    color: #721c24;
+}
