@@ -3,26 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Статистика - Экран 3</title>
+    <title>Статистика</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1 data-i18n="title">Статистика</h1>
-            <a href="/" class="back-link">← Назад</a>
+            <h1>Статистика использования</h1>
+            <a href="/" class="back-link">← Назад на главную</a>
         </header>
 
         <main>
-            <div class="statistics-section">
-                <h2>Статистика использования калькулятора</h2>
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-calculations">0</div>
+                    <div class="stat-label">Всего вычислений</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="most-used">—</div>
+                    <div class="stat-label">Самая частая операция</div>
+                </div>
+            </div>
 
-                <!-- TODO: Добавьте компоненты статистики здесь -->
-                <!-- Пример: график операций, топ-5, счетчики и т.д. -->
+            <div class="chart-section">
+                <h2>Распределение операций</h2>
+                <div id="operations-chart" class="chart"></div>
+            </div>
 
-                <p style="color: #999; text-align: center; margin-top: 50px;">
-                    Экран статистики - TODO
-                </p>
+            <div class="top-operations">
+                <h2>Топ-5 операций</h2>
+                <div id="top-list" class="top-list"></div>
+            </div>
+
+            <div class="button-group">
+                <button id="refresh-btn" class="btn btn-primary">Обновить статистику</button>
+                <button id="clear-stats-btn" class="btn btn-secondary">Очистить данные</button>
             </div>
         </main>
     </div>
