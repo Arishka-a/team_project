@@ -33,11 +33,11 @@ jobs:
       - name: Checkstyle
         run: ./gradlew checkstyleMain checkstyleTest
 
-      # Проверка размера PR 
+      # Проверка размера PR
       - name: Проверка размера PR
         if: github.event_name == 'pull_request'
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Проверка размера PR #${{ github.event.pull_request.number }}"
           python -m pip install PyGithub --quiet
@@ -47,22 +47,22 @@ jobs:
             --pr-number ${{ github.event.pull_request.number }} \
             --check-size
 
-      # Вывод команды 
+      # Вывод команды
       - name: Вывод команды
         if: github.event_name == 'pull_request'
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python scripts/check_pr.py \
             --token "$GITHUB_TOKEN" \
             --repo "${{ github.repository }}" \
             --list-members
 
-      # Обновление Epic PR 
+      # Обновление Epic PR
       - name: Обновление описания Epic PR
         if: github.event_name == 'pull_request' && contains(github.head_ref, 'epic/')
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Обновляем epic PR..."
           python scripts/check_pr.py \
@@ -90,7 +90,7 @@ jobs:
           path: build/libs/*.jar
           retention-days: 1
 
-  # STAGE 3: Run Tests 
+  # STAGE 3: Run Tests
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -101,7 +101,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - run: chmod +x ./gradlew
-      - run: ./gradlew test
+
+      # Запуск всех тестов
+      - name: Run All Tests
+        run: ./gradlew test
+
+      # Публикация результатов тестов
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/test-results/test/*.xml
+          check_name: "Test Results"
 
   # STAGE 4: Publish Release 
   publish:
