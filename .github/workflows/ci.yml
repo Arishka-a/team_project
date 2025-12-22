@@ -113,6 +113,8 @@ jobs:
         with:
           files: build/test-results/test/*.xml
           check_name: "Test Results"
+          comment_mode: off
+          check_run_annotations: none
 
   # STAGE 4: Publish Release 
   publish:

@@ -1,4 +1,3 @@
-// Глобальные переменные
 let currentExpression = '';
 let currentValue = '0';
 let pendingOperation = null;
@@ -6,17 +5,14 @@ let pendingValue = null;
 let currentLanguage = localStorage.getItem('language') || 'ru';
 let translations = {};
 
-// API endpoints
 const API_BASE = '/api';
 
-// Инициализация
 document.addEventListener('DOMContentLoaded', () => {
     loadTranslations();
     initializeEventListeners();
     loadHistory();
 });
 
-// Загрузка переводов
 async function loadTranslations() {
     try {
         const response = await fetch(`locales/${currentLanguage}.json`);
@@ -27,7 +23,6 @@ async function loadTranslations() {
     }
 }
 
-// Применение переводов
 function applyTranslations() {
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
@@ -37,33 +32,26 @@ function applyTranslations() {
     });
 }
 
-// Инициализация обработчиков событий
+
 function initializeEventListeners() {
-    // Числа и точка
     document.querySelectorAll('.number').forEach(btn => {
         btn.addEventListener('click', () => handleNumber(btn.dataset.value));
     });
 
-    // Операции
     document.querySelectorAll('.operation').forEach(btn => {
         btn.addEventListener('click', () => handleOperation(btn.dataset.value));
     });
 
-    // Равно
     document.getElementById('equals').addEventListener('click', calculateResult);
 
-    // Очистить
     document.getElementById('clear').addEventListener('click', clearCalculator);
 
-    // Очистить историю
     document.getElementById('clear-history').addEventListener('click', clearHistory);
 
-    // Переключение языка
     document.getElementById('lang-ru').addEventListener('click', () => switchLanguage('ru'));
     document.getElementById('lang-en').addEventListener('click', () => switchLanguage('en'));
 }
 
-// Обработка чисел
 function handleNumber(num) {
     if (currentValue === '0' || currentValue === 'Error') {
         currentValue = num;
@@ -73,16 +61,13 @@ function handleNumber(num) {
     updateDisplay();
 }
 
-// Обработка операций
 function handleOperation(operation) {
-    // Для sin, cos, factorial - сразу вычисляем
     if (['sin', 'cos', 'factorial'].includes(operation)) {
         const value = parseFloat(currentValue);
         if (!isNaN(value)) {
             calculateAPIOperation(operation, [value]);
         }
     } else {
-        // Для бинарных операций
         if (pendingOperation) {
             calculateResult();
         }
@@ -94,7 +79,6 @@ function handleOperation(operation) {
     }
 }
 
-// Вычисление результата
 async function calculateResult() {
     if (!pendingOperation || pendingValue === null) return;
 
@@ -108,7 +92,6 @@ async function calculateResult() {
     pendingValue = null;
 }
 
-// Вызов API для вычисления
 async function calculateAPIOperation(operation, operands) {
     try {
         const response = await fetch(`${API_BASE}/calculate`, {
@@ -136,7 +119,6 @@ async function calculateAPIOperation(operation, operands) {
     }
 }
 
-// Получение символа операции
 function getOperationSymbol(operation) {
     const symbols = {
         'add': '+',
@@ -148,13 +130,11 @@ function getOperationSymbol(operation) {
     return symbols[operation] || operation;
 }
 
-// Обновление дисплея
 function updateDisplay() {
     document.getElementById('expression').textContent = currentExpression;
     document.getElementById('result').textContent = currentValue;
 }
 
-// Очистка калькулятора
 function clearCalculator() {
     currentValue = '0';
     currentExpression = '';
@@ -163,7 +143,6 @@ function clearCalculator() {
     updateDisplay();
 }
 
-// Загрузка истории
 async function loadHistory() {
     try {
         const response = await fetch(`${API_BASE}/history`);
@@ -176,7 +155,6 @@ async function loadHistory() {
     }
 }
 
-// Отображение истории
 function displayHistory(history) {
     const historyList = document.getElementById('history-list');
     historyList.innerHTML = '';
@@ -186,7 +164,6 @@ function displayHistory(history) {
         return;
     }
 
-    // Показываем историю в обратном порядке (новые сверху)
     history.reverse().forEach(item => {
         const historyItem = document.createElement('div');
         historyItem.className = 'history-item';
@@ -207,7 +184,6 @@ function displayHistory(history) {
     });
 }
 
-// Форматирование операции для истории
 function formatHistoryOperation(item) {
     const { operation, operands } = item;
 
@@ -221,7 +197,6 @@ function formatHistoryOperation(item) {
     }
 }
 
-// Удаление элемента из истории
 async function deleteHistoryItem(id) {
     try {
         const response = await fetch(`${API_BASE}/history/${id}`, {
@@ -236,7 +211,6 @@ async function deleteHistoryItem(id) {
     }
 }
 
-// Очистка всей истории
 async function clearHistory() {
     if (!confirm(translations.confirmClearHistory || 'Очистить всю историю?')) {
         return;
@@ -255,12 +229,10 @@ async function clearHistory() {
     }
 }
 
-// Переключение языка
 function switchLanguage(lang) {
     currentLanguage = lang;
     localStorage.setItem('language', lang);
 
-    // Обновление активной кнопки
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.remove('active');
     });

@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * REST API контроллер для калькулятора.
- */
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Calculator", description = "API для выполнения математических операций")

@@ -1,8 +1,5 @@
 package com.example.model;
 
-/**
- * Ответ с результатом математической операции.
- */
 public class CalculationResponse {
     private double result;
 

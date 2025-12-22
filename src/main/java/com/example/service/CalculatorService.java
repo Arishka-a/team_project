@@ -3,9 +3,7 @@ package com.example.service;
 import com.example.Calculator;
 import org.springframework.stereotype.Service;
 
-/**
- * Сервис для выполнения математических операций.
- */
+
 @Service
 public class CalculatorService {
     private final Calculator calculator;
@@ -14,14 +12,6 @@ public class CalculatorService {
         this.calculator = new Calculator();
     }
 
-    /**
-     * Выполняет математическую операцию.
-     *
-     * @param operation тип операции
-     * @param operands операнды
-     * @return результат операции
-     * @throws IllegalArgumentException если операция неизвестна или неверное количество операндов
-     */
     public double calculate(String operation, double[] operands) {
         return switch (operation.toLowerCase()) {
             case "add" -> binaryOperation(operands, 2, "Add", calculator::add);

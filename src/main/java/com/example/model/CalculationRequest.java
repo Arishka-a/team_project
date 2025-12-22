@@ -1,8 +1,5 @@
 package com.example.model;
 
-/**
- * Запрос на выполнение математической операции.
- */
 public class CalculationRequest {
     private String operation;
 

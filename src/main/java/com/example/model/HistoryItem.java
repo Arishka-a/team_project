@@ -1,8 +1,5 @@
 package com.example.model;
 
-/**
- * Элемент истории вычислений.
- */
 public class HistoryItem {
     private Long id;
 
