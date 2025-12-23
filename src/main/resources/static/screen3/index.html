@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Статистика использования</h1>
+            <a href="/" class="back-link">← Назад на главную</a>
+        </header>
+
+        <main>
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-calculations">0</div>
+                    <div class="stat-label">Всего вычислений</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="most-used">—</div>
+                    <div class="stat-label">Самая частая операция</div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <h2>Распределение операций</h2>
+                <div id="operations-chart" class="chart"></div>
+            </div>
+
+            <div class="top-operations">
+                <h2>Топ-5 операций</h2>
+                <div id="top-list" class="top-list"></div>
+            </div>
+
+            <div class="button-group">
+                <button id="refresh-btn" class="btn btn-primary">Обновить статистику</button>
+                <button id="clear-stats-btn" class="btn btn-secondary">Очистить данные</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
